@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Friends of BMTC</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Modern Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header>
+  <div class="nav-container">
+    <h1>Friends of BMTC</h1>
+    <nav>
+      <button id="langToggle">EN | ಕನ್ನಡ</button>
+      <button id="themeToggle">🌙</button>
+      <a href="index.html">🏠 Home</a>
+      <a href="about.html">ℹ️ About</a>
+      <a href="timetable.html">🕒 Timetables</a>
+      <a href="contact.html">📞 Contact</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <h2>Making Bengaluru’s Bus System Easier</h2>
+  <p>
+    Friends of BMTC is a community-driven initiative helping commuters
+    understand routes, schedules, and services better.
+  </p>
+  <a href="timetable.html" class="btn">Explore Timetables</a>
+</section>
+
+<main class="container">
+  <section class="features">
+    <div class="card">🚍 Clear Route Information</div>
+    <div class="card">🕒 Simplified Timetables</div>
+    <div class="card">🤝 Community-Driven Advocacy</div>
+  </section>
+</main>
+
+<footer>
+  © Friends of BMTC
+</footer>
+
+<script>
+const translations = {
+  en: {
+    heroTitle: "Making Bengaluru's Bus System Easier",
+    heroDesc: "Friends of BMTC is a community-driven initiative helping commuters understand routes, schedules, and services better.",
+    btnText: "Explore Timetables",
+    feature1: "🚍 Clear Route Information",
+    feature2: "🕒 Simplified Timetables",
+    feature3: "🤝 Community-Driven Advocacy"
+  },
+  kn: {
+    heroTitle: "ಬೆಂಗಳೂರಿನ ಬಸ್ ಸಿಸ್ಟಮ್ ಅನ್ನು ಸುಲಭಗೊಳಿಸುವುದು",
+    heroDesc: "ಫ್ರೆಂಡ್ಸ್ ಆಫ್ ಬಿಎಂಟಿಸಿ ಎಂಬುದು ಸಮುದಾಯ ಆಧಾರಿತ ಉಪಕ್ರಮವಾಗಿದ್ದು, ಪ್ರಯಾಣಿಕರಿಗೆ ಮಾರ್ಗಗಳು, ವೇಳಾಪಟ್ಟಿಗಳು ಮತ್ತು ಸೇವೆಗಳನ್ನು ತಿಳಿಸಲು ಸಹಾಯ ಮಾಡುತ್ತದೆ.",
+    btnText: "ವೇಳಾಪಟ್ಟಿಗಳನ್ನು ಅನ್ವೇಷಿಸಿ",
+    feature1: "🚍 ಸ್ಪಷ್ಟ ಮಾರ್ಗ ಮಾಹಿತಿ",
+    feature2: "🕒 ಸರಳೀಕೃತ ವೇಳಾಪಟ್ಟಿಗಳು",
+    feature3: "🤝 ಸಮುದಾಯ ಆಧಾರಿತ ಸಮರ್ಥನೆ"
+  }
+};
+
+let currentLang = localStorage.getItem("lang") || "en";
+
+function updateTexts() {
+  const t = translations[currentLang];
+  document.querySelector(".hero h2").textContent = t.heroTitle;
+  document.querySelector(".hero p").textContent = t.heroDesc;
+  document.querySelector(".btn").textContent = t.btnText;
+  document.querySelectorAll(".card").forEach((card, i) => {
+    card.textContent = t[`feature${i+1}`];
+  });
+}
+
+document.getElementById("langToggle")?.addEventListener("click", () => {
+  currentLang = currentLang === "en" ? "kn" : "en";
+  localStorage.setItem("lang", currentLang);
+  updateTexts();
+});
+
+document.getElementById("themeToggle")?.addEventListener("click", () => {
+  document.body.classList.toggle("dark");
+  localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+  updateThemeIcon();
+});
+
+function updateThemeIcon() {
+  const themeBtn = document.getElementById("themeToggle");
+  if (themeBtn) {
+    themeBtn.textContent = document.body.classList.contains("dark") ? "☀️" : "🌙";
+  }
+}
+
+// Load theme and lang
+if (localStorage.getItem("theme") === "dark") {
+  document.body.classList.add("dark");
+}
+updateThemeIcon();
+updateTexts();
+</script>
+
+</body>
+</html>

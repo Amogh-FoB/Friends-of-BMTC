@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Contact – Friends of BMTC</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header>
+  <div class="nav-container">
+    <h1>Friends of BMTC</h1>
+    <nav>
+      <button id="langToggle">EN | ಕನ್ನಡ</button>
+      <button id="themeToggle">🌙</button>
+      <a href="index.html">🏠 Home</a>
+      <a href="about.html">ℹ️ About</a>
+      <a href="timetable.html">🕒 Timetables</a>
+      <a href="contact.html">📞 Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <h2>Contact Us</h2>
+
+  <form class="contact-form">
+    <input type="text" placeholder="Your name" required>
+    <input type="email" placeholder="Your email" required>
+    <textarea placeholder="Your message"></textarea>
+    <button type="submit">Send Message</button>
+  </form>
+
+  <p><strong>Email:</strong> friendsofbmtc@gmail.com</p>
+
+  <p>
+    <strong>Follow us:</strong>
+    <a href="#">Twitter</a> ·
+    <a href="#">Instagram</a> ·
+    <a href="#">Facebook</a>
+  </p>
+</main>
+
+<footer>
+  © Friends of BMTC
+</footer>
+
+<script>
+const translations = {
+  en: {
+    contactUs: "Contact Us",
+    name: "Your name",
+    email: "Your email",
+    message: "Your message",
+    send: "Send Message",
+    emailLabel: "Email:",
+    follow: "Follow us:"
+  },
+  kn: {
+    contactUs: "ನಮ್ಮನ್ನು ಸಂಪರ್ಕಿಸಿ",
+    name: "ನಿಮ್ಮ ಹೆಸರು",
+    email: "ನಿಮ್ಮ ಇಮೇಲ್",
+    message: "ನಿಮ್ಮ ಸಂದೇಶ",
+    send: "ಸಂದೇಶ ಕಳುಹಿಸಿ",
+    emailLabel: "ಇಮೇಲ್:",
+    follow: "ನಮ್ಮನ್ನು ಅನುಸರಿಸಿ:"
+  }
+};
+
+let currentLang = localStorage.getItem("lang") || "en";
+
+function updateTexts() {
+  const t = translations[currentLang];
+  document.querySelector("h2").textContent = t.contactUs;
+  document.querySelector('input[placeholder]').placeholder = t.name;
+  document.querySelector('input[type="email"]').placeholder = t.email;
+  document.querySelector('textarea').placeholder = t.message;
+  document.querySelector('button[type="submit"]').textContent = t.send;
+  document.querySelector('p strong').textContent = t.emailLabel;
+  document.querySelector('p:nth-of-type(2) strong').textContent = t.follow;
+}
+
+document.getElementById("langToggle")?.addEventListener("click", () => {
+  currentLang = currentLang === "en" ? "kn" : "en";
+  localStorage.setItem("lang", currentLang);
+  updateTexts();
+});
+
+document.getElementById("themeToggle")?.addEventListener("click", () => {
+  document.body.classList.toggle("dark");
+  localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+  updateThemeIcon();
+});
+
+function updateThemeIcon() {
+  const themeBtn = document.getElementById("themeToggle");
+  if (themeBtn) {
+    themeBtn.textContent = document.body.classList.contains("dark") ? "☀️" : "🌙";
+  }
+}
+
+// Load theme and lang
+if (localStorage.getItem("theme") === "dark") {
+  document.body.classList.add("dark");
+}
+updateThemeIcon();
+updateTexts();
+</script>
+
+</body>
+</html>

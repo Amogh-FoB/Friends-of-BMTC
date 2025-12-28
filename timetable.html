@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>BMTC Timetables – Friends of BMTC</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="manifest" href="manifest.json">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header>
+  <div class="nav-container">
+    <h1>Friends of BMTC</h1>
+    <nav>
+      <button id="langToggle">EN | ಕನ್ನಡ</button>
+      <button id="themeToggle">🌙</button>
+      <a href="index.html">🏠 Home</a>
+      <a href="about.html">ℹ️ About</a>
+      <a href="timetable.html">🕒 Timetables</a>
+      <a href="contact.html">📞 Contact</a>
+    </nav>
+  </div>
+</header>
+
+<!-- Sticky Search -->
+<div class="sticky-search">
+  <div class="search-controls">
+    <input type="text" id="searchInput" placeholder="Search route / source / destination">
+    <label for="sortSelect">Sort by:</label>
+    <select id="sortSelect">
+      <option value="route-asc">Route ↑</option>
+      <option value="route-desc">Route ↓</option>
+    </select>
+  </div>
+  <div class="filters">
+    <label><input type="checkbox" id="filterUp" checked> UP</label>
+    <label><input type="checkbox" id="filterDown" checked> DOWN</label>
+  </div>
+</div>
+
+<main class="container">
+  <h2 id="titleText">BMTC Timetables</h2>
+  <div id="loading">Loading timetables...</div>
+  <div id="routes"></div>
+</main>
+
+<footer>© Friends of BMTC</footer>
+
+<script src="js/timetable.js"></script>
+
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("service-worker.js");
+}
+</script>
+
+</body>
+</html>
