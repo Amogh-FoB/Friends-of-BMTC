@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Bus body -->
+  <rect x="12" y="6" width="40" height="46" rx="6" ry="6" fill="#b91c1c"/>
+
+  <!-- Windshield -->
+  <rect x="18" y="10" width="28" height="16" rx="3" fill="#e5e7eb"/>
+
+  <!-- Destination board -->
+  <rect x="18" y="30" width="28" height="6" rx="2" fill="#1f2937"/>
+
+  <!-- Headlights -->
+  <circle cx="18" cy="48" r="3" fill="#fde68a"/>
+  <circle cx="46" cy="48" r="3" fill="#fde68a"/>
+
+  <!-- Wheels -->
+  <circle cx="20" cy="56" r="4" fill="#111827"/>
+  <circle cx="44" cy="56" r="4" fill="#111827"/>
+
+  <!-- BMTC stripe -->
+  <rect x="12" y="38" width="40" height="3" fill="#facc15"/>
+</svg>

@@ -18,10 +18,10 @@
     <h1>Friends of BMTC</h1>
     <nav>
       <button id="langToggle">EN | ಕನ್ನಡ</button>
-      <button id="themeToggle">🌙</button>
       <a href="index.html">🏠 Home</a>
       <a href="about.html">ℹ️ About</a>
       <a href="timetable.html">🕒 Timetables</a>
+      <a href="tracker.html">📍 Track Bus</a>
       <a href="contact.html">📞 Contact</a>
     </nav>
   </div>
@@ -92,24 +92,6 @@ document.getElementById("langToggle")?.addEventListener("click", () => {
   updateTexts();
 });
 
-document.getElementById("themeToggle")?.addEventListener("click", () => {
-  document.body.classList.toggle("dark");
-  localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
-  updateThemeIcon();
-});
-
-function updateThemeIcon() {
-  const themeBtn = document.getElementById("themeToggle");
-  if (themeBtn) {
-    themeBtn.textContent = document.body.classList.contains("dark") ? "☀️" : "🌙";
-  }
-}
-
-// Load theme and lang
-if (localStorage.getItem("theme") === "dark") {
-  document.body.classList.add("dark");
-}
-updateThemeIcon();
 updateTexts();
 </script>
 

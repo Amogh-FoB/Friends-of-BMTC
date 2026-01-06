@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Track Bus – Friends of BMTC</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Leaflet Map Library -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+  
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .tracker-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    .search-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 32px;
+      margin-bottom: 30px;
+      box-shadow: var(--shadow);
+    }
+
+    .search-form {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .search-form input {
+      flex: 1;
+      min-width: 250px;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 1rem;
+      transition: all 0.2s;
+    }
+
+    .search-form input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.2);
+    }
+
+    .search-container {
+      flex: 1;
+      min-width: 250px;
+      position: relative;
+    }
+
+    #vehicleInput {
+      width: 100%;
+    }
+
+    .dropdown-results {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 10px 10px;
+      max-height: 300px;
+      overflow-y: auto;
+      z-index: 100;
+      box-shadow: var(--shadow);
+    }
+
+    .dropdown-results.hidden {
+      display: none;
+    }
+
+    .dropdown-item {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .dropdown-item:last-child {
+      border-bottom: none;
+    }
+
+    .dropdown-item:hover {
+      background: var(--bg);
+      color: var(--primary);
+    }
+
+    .dropdown-item-main {
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+
+    .dropdown-item-sub {
+      font-size: 0.85rem;
+      color: var(--text-light);
+    }
+
+    .search-form button {
+      padding: 12px 32px;
+      background: linear-gradient(135deg, #00d9ff 0%, #ff006e 100%);
+      color: #0f172a;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(0, 217, 255, 0.3);
+      width: auto;
+    }
+
+    .search-form button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 217, 255, 0.4);
+    }
+
+    .search-info {
+      font-size: 0.9rem;
+      color: var(--text-light);
+    }
+
+    .map-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      margin-bottom: 30px;
+    }
+
+    #map {
+      width: 100%;
+      height: 500px;
+      background: #1a2332;
+    }
+
+    .details-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 32px;
+      box-shadow: var(--shadow);
+    }
+
+    .vehicle-details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 24px;
+    }
+
+    .detail-item {
+      padding: 16px;
+      background: var(--bg);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+
+    .detail-label {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    .detail-value {
+      font-size: 1.1rem;
+      color: var(--text);
+      font-weight: 600;
+      word-break: break-word;
+    }
+
+    .status-running {
+      color: #10b981;
+    }
+
+    .status-stopped {
+      color: #ff6b6b;
+    }
+
+    .error-message {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+      padding: 16px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    .success-message {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #86efac;
+      padding: 16px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-light);
+    }
+
+    .spinner {
+      border: 3px solid rgba(0, 217, 255, 0.2);
+      border-top: 3px solid #00d9ff;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .autocomplete-item {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .autocomplete-item:hover {
+      background: rgba(0, 217, 255, 0.1);
+      color: var(--primary);
+    }
+
+    .autocomplete-item:last-child {
+      border-bottom: none;
+    }
+
+    .autocomplete-item-main {
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .autocomplete-item-sub {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      margin-top: 4px;
+    }
+
+    @media (max-width: 768px) {
+      .search-form {
+        flex-direction: column;
+      }
+
+      .search-form input,
+      .search-form button {
+        width: 100%;
+      }
+
+      #map {
+  width: 100%;
+  height: 500px; /* 👈 REQUIRED */
+  min-height: 500px;
+}
+
+
+      .vehicle-details {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="nav-container">
+    <h1>Friends of BMTC</h1>
+    <nav>
+      <button id="langToggle">EN | ಕನ್ನಡ</button>
+      <a href="index.html">🏠 Home</a>
+      <a href="about.html">ℹ️ About</a>
+      <a href="timetable.html">🕒 Timetables</a>
+      <a href="tracker.html">📍 Track Bus</a>
+      <a href="contact.html">📞 Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main class="tracker-container">
+  <h2 id="trackerTitle">Track Bus by Vehicle Number</h2>
+  
+  <div class="search-section">
+    <div class="search-form">
+      <div class="search-container">
+        <input 
+          type="text" 
+          id="vehicleInput" 
+          placeholder="Enter vehicle number (e.g., 19436)" 
+          autocomplete="off"
+        >
+        <div id="dropdownResults" class="dropdown-results hidden"></div>
+      </div>
+      <button id="searchBtn">Track Vehicle</button>
+    </div>
+    <p class="search-info">Enter a vehicle number to track its real-time location and trip details</p>
+  </div>
+
+  <div id="messageContainer"></div>
+
+  <div id="mapSection" class="map-section hidden">
+    <div id="map"></div>
+  </div>
+
+  <div id="detailsSection" class="details-section hidden">
+    <div class="vehicle-details" id="vehicleDetails"></div>
+  </div>
+
+  <div id="vehicleListSection" class="details-section hidden">
+    <h3 style="margin-top: 0; color: var(--primary);">Select a Vehicle</h3>
+    <p style="color: var(--text-light); margin-bottom: 20px;">Multiple vehicles found. Please select one:</p>
+    <div id="vehicleList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;"></div>
+  </div>
+
+  <div id="loadingSection" class="hidden">
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>Tracking vehicle...</p>
+    </div>
+  </div>
+</main>
+
+<footer>
+  © Friends of BMTC
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+/* ================= TRANSLATIONS ================= */
+const translations = {
+  en: {
+    trackerTitle: "Track Bus by Vehicle Number",
+    placeholder: "Enter vehicle number (e.g., KA57F0979)",
+    trackBtn: "Track Vehicle",
+    info: "Enter a vehicle number to track its real-time location and trip details"
+  },
+  kn: {
+    trackerTitle: "ವಾಹನ ಸಂಖ್ಯೆಯ ಮೂಲಕ ಬಸ್ ಅನ್ನು ಟ್ರ್ಯಾಕ್ ಮಾಡಿ",
+    placeholder: "ವಾಹನ ಸಂಖ್ಯೆ ನಮೂದಿಸಿ (ಉದಾ: KA57F0979)",
+    trackBtn: "ವಾಹನವನ್ನು ಟ್ರ್ಯಾಕ್ ಮಾಡಿ",
+    info: "ನಿಜ-ಸಮಯದ ಸ್ಥಳ ಮತ್ತು ಟ್ರಿಪ್ ವಿವರಗಳನ್ನು ಟ್ರ್ಯಾಕ್ ಮಾಡಲು ವಾಹನ ಸಂಖ್ಯೆ ನಮೂದಿಸಿ"
+  }
+};
+
+let currentLang = localStorage.getItem("lang") || "en";
+
+/* ================= GLOBAL STATE ================= */
+let map = null;
+let marker = null;
+let autoRefreshTimer = null;
+let currentVehicleId = null;
+let searchTimeout = null;
+const busIcon = L.icon({
+  iconUrl: "assets/icons/bus.svg",
+  iconSize: [36, 36],
+  iconAnchor: [18, 18],     // center of icon
+  popupAnchor: [0, -18]
+});
+
+const stopIcon = L.icon({
+  iconUrl: "assets/icons/bmtc-stop.svg",
+  iconSize: [16, 16],
+  iconAnchor: [8, 8],
+  popupAnchor: [0, -8]
+});
+
+const nextStopIcon = L.icon({
+  iconUrl: "assets/icons/bmtc-stop.svg",
+  iconSize: [26, 26],   // 👈 bigger
+  iconAnchor: [13, 13],
+  popupAnchor: [0, -13]
+});
+
+const API_PROXY_URL = "http://localhost:3000/api";
+
+/* ================= UI HELPERS ================= */
+function updateTexts() {
+  const t = translations[currentLang];
+  document.getElementById("trackerTitle").textContent = t.trackerTitle;
+  document.getElementById("vehicleInput").placeholder = t.placeholder;
+  document.getElementById("searchBtn").textContent = t.trackBtn;
+  document.querySelector(".search-info").textContent = t.info;
+}
+
+function showMessage(text, type = "error") {
+  document.getElementById("messageContainer").innerHTML =
+    `<div class="${type}-message">${text}</div>`;
+}
+
+function clearMessage() {
+  document.getElementById("messageContainer").innerHTML = "";
+}
+
+function showLoading(show) {
+  document.getElementById("loadingSection")
+    .classList.toggle("hidden", !show);
+}
+
+/* ================= MAP ================= */
+function initMap() {
+  if (map) {
+    map.remove();
+    map = null;
+  }
+
+  map = L.map("map").setView([12.9716, 77.5946], 12);
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: "© OpenStreetMap contributors"
+  }).addTo(map);
+}
+
+/* ================= AUTOCOMPLETE ================= */
+document.getElementById("vehicleInput").addEventListener("input", (e) => {
+  const value = e.target.value.trim();
+  clearTimeout(searchTimeout);
+
+  if (value.length < 2) {
+    document.getElementById("dropdownResults").classList.add("hidden");
+    return;
+  }
+
+  searchTimeout = setTimeout(() => {
+    searchVehicles(value);
+  }, 300);
+});
+
+async function searchVehicles(query) {
+  const dropdown = document.getElementById("dropdownResults");
+
+  try {
+    const response = await fetch(`${API_PROXY_URL}/vehicles/search`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ vehicleRegNo: query })
+    });
+
+    const data = await response.json();
+
+    if (!data.Issuccess || !data.data || data.data.length === 0) {
+      dropdown.innerHTML = `<div class="dropdown-item">No vehicles found</div>`;
+      dropdown.classList.remove("hidden");
+      return;
+    }
+
+    dropdown.innerHTML = data.data.slice(0, 10).map(v => `
+      <div class="dropdown-item"
+           onclick="selectFromDropdown('${v.vehicleId}','${v.vehicleRegNo || v.vehicleregno}')">
+        <div class="dropdown-item-main">${v.vehicleRegNo || v.vehicleregno}</div>
+        <div class="dropdown-item-sub">ID: ${v.vehicleId}</div>
+      </div>
+    `).join("");
+
+    dropdown.classList.remove("hidden");
+
+  } catch {
+    dropdown.innerHTML =
+      `<div class="dropdown-item">Error fetching vehicles</div>`;
+    dropdown.classList.remove("hidden");
+  }
+}
+
+function selectFromDropdown(vehicleId, vehicleRegNo) {
+  document.getElementById("vehicleInput").value = vehicleRegNo;
+  document.getElementById("dropdownResults").classList.add("hidden");
+  trackVehicleById(vehicleId);
+}
+
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".search-container")) {
+    document.getElementById("dropdownResults").classList.add("hidden");
+  }
+});
+
+/* ================= TRACK VEHICLE ================= */
+async function trackVehicle() {
+  const vehicleNumber = document.getElementById("vehicleInput").value.trim();
+  if (!vehicleNumber) {
+    showMessage("Please enter a vehicle number");
+    return;
+  }
+
+  clearMessage();
+  showLoading(true);
+
+  if (autoRefreshTimer) {
+    clearInterval(autoRefreshTimer);
+    autoRefreshTimer = null;
+  }
+
+  try {
+    const res = await fetch(`${API_PROXY_URL}/vehicles/search`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ vehicleRegNo: vehicleNumber })
+    });
+
+    const data = await res.json();
+    showLoading(false);
+
+    if (!data.Issuccess || !data.data.length) {
+      showMessage("Vehicle not found");
+      return;
+    }
+
+    trackVehicleById(data.data[0].vehicleId);
+
+  } catch {
+    showLoading(false);
+    showMessage("Proxy server not reachable");
+  }
+}
+
+async function trackVehicleById(vehicleId) {
+  currentVehicleId = vehicleId;
+  showLoading(true);
+
+  try {
+    const res = await fetch(`${API_PROXY_URL}/vehicles/details`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ vehicleId })
+    });
+
+    const result = await res.json();
+    showLoading(false);
+
+    if (!result.success || !result.data) {
+      showMessage("No active trip found");
+      return;
+    }
+
+    displayVehicleInfo(result);
+    showMessage("Vehicle found! Tracking live.", "success");
+    startAutoRefresh();
+
+  } catch {
+    showLoading(false);
+    showMessage("Failed to track vehicle");
+  }
+}
+
+/* ================= DISPLAY ================= */
+function displayVehicleInfo(apiResponse) {
+  const data = apiResponse.data;
+  const routeRows = data.RouteDetails;
+  const live = data.LiveLocation?.[0];
+
+  if (!routeRows?.length || !live) {
+    showMessage("No live tracking data");
+    return;
+  }
+
+  const first = routeRows[0];
+
+  document.getElementById("mapSection").classList.remove("hidden");
+  document.getElementById("detailsSection").classList.remove("hidden");
+
+  initMap();
+  requestAnimationFrame(() => map.invalidateSize());
+
+  marker = L.marker(
+  [live.latitude, live.longitude],
+  { icon: busIcon }
+).addTo(map);
+  
+  const points = routeRows
+  .filter(r => r.latitude && r.longitude)
+  .map(r => [r.latitude, r.longitude]);
+
+if (points.length > 1) {
+  // Draw route line
+  L.polyline(points, {
+    color: "#00d9ff",
+    weight: 4
+  }).addTo(map);
+
+  // 🔴🟢 DRAW ALL STOPS (with NEXT STOP highlighted)
+  routeRows.forEach(r => {
+  if (!r.latitude || !r.longitude) return;
+
+  const isNextStop =
+    live.nextstop &&
+    live.nextstop.toLowerCase().includes(r.stationname.toLowerCase());
+
+  L.circleMarker([r.latitude, r.longitude], {
+    radius: isNextStop ? 12 : 8,
+    color: isNextStop ? "#14532d" : "#111827",
+    fillColor: isNextStop ? "#22c55e" : "#ff006e",
+    fillOpacity: 1,
+    weight: 2
+  })
+  .addTo(map)
+  .bindPopup(
+    isNextStop
+      ? `➡️ Next Stop: ${r.stationname}`
+      : `🚏 ${r.stationname}`
+  );
+});
+
+  // Fit route into view
+  map.fitBounds(points, { padding: [40, 40] });
+}
+
+
+  document.getElementById("vehicleDetails").innerHTML = `
+    <div class="detail-item"><b>Vehicle</b><br>${first.busno}</div>
+    <div class="detail-item"><b>Route</b><br>${first.routeno} – ${first.routename}</div>
+    <div class="detail-item"><b>Status</b><br>${first.tripstatus}</div>
+    <div class="detail-item"><b>From</b><br>${first.sourcestation}</div>
+    <div class="detail-item"><b>To</b><br>${first.destinationstation}</div>
+    <div class="detail-item"><b>Current</b><br>${live.location}</div>
+    <div class="detail-item"><b>Next Stop</b><br>${live.nextstop}</div>
+  `;
+}
+
+/* ================= AUTO REFRESH ================= */
+function startAutoRefresh() {
+  if (!currentVehicleId) return;
+
+  autoRefreshTimer = setInterval(async () => {
+    try {
+      const res = await fetch(`${API_PROXY_URL}/vehicles/details`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ vehicleId: currentVehicleId })
+      });
+
+      const result = await res.json();
+      const live = result.data?.LiveLocation?.[0];
+      if (!live || !marker) return;
+
+      marker.setLatLng([live.latitude, live.longitude]);
+
+    } catch {}
+  }, 10000);
+}
+
+/* ================= EVENTS ================= */
+document.getElementById("searchBtn").addEventListener("click", trackVehicle);
+document.getElementById("vehicleInput").addEventListener("keypress", e => {
+  if (e.key === "Enter") trackVehicle();
+});
+
+document.getElementById("langToggle").addEventListener("click", () => {
+  currentLang = currentLang === "en" ? "kn" : "en";
+  localStorage.setItem("lang", currentLang);
+  updateTexts();
+});
+
+/* ================= INIT ================= */
+updateTexts();
+</script>
+
+</body>
+</html>
